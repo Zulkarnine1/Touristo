@@ -12,7 +12,7 @@ const DUMMY_PLACES = [
     address: "Yuejiang W Rd, Haizhu District, Guangzhou, Guangdong Province, China",
     location: {
       lat: 23.10748,
-      long: 113.3226476,
+      lng: 113.3226476,
     },
     creator: "u1",
   },
@@ -25,7 +25,7 @@ const DUMMY_PLACES = [
     address: "Yuejiang W Rd, Haizhu District, Guangzhou, Guangdong Province, China",
     location: {
       lat: 23.10748,
-      long: 113.3226476,
+      lng: 113.3226476,
     },
     creator: "u2",
   },
