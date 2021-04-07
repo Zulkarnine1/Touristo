@@ -9,9 +9,13 @@ const router = express.Router()
 router.get("/:pid", placesControllers.getPlaceByID);
 
 
-router.get("/user/:uid", placesControllers.getPlaceByUserID);
+router.get("/user/:uid", placesControllers.getPlacesByUserID);
 
 
 router.post("/", placesControllers.createPlace)
+
+router.patch("/:pid", placesControllers.patchPlace);
+
+router.delete("/:pid", placesControllers.deletePlace);
 
 module.exports = router
