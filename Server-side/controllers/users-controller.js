@@ -1,4 +1,5 @@
 const HttpError = require("../models/http-error")
+const {validationResult} = require("express-validator")
 
 const { v4: uuidv4 } = require("uuid");
 
@@ -30,6 +31,13 @@ const getUsers = (req,res,next)=>{
 }
 
 const createUser = (req, res, next) => {
+
+    const errors = validationResult(req);
+
+    if(!errors.isEmpty()){
+      throw new HttpError("Invalid data passed, please check your data", 422)
+    }
+
     const {name, email, password} = req.body
 
 
@@ -56,6 +64,8 @@ const createUser = (req, res, next) => {
 
 
 const userLogin = (req, res, next) => {
+
+   
 
     const {email, password} = req.body
 
