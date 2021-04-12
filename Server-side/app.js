@@ -1,5 +1,7 @@
 const express = require("express")
 const bodyParser = require("body-parser")
+const mongoose = require("mongoose")
+require("dotenv").config();
 
 const placesRoutes = require("./routes/places-routes")
 const usersRoutes = require("./routes/users-routes")
@@ -30,4 +32,12 @@ app.use((error, req, res, next)=>{
 })
 
 
-app.listen(5000)
+mongoose
+  .connect(process.env.MONGO_KEY, { useNewUrlParser: true, useUnifiedTopology: true, useCreateIndex: true })
+  .then(() => {
+    app.listen(5000);
+  })
+  .catch((err) => {
+    console.log(err);
+  });
+
