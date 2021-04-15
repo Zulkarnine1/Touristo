@@ -34,25 +34,23 @@ const getPlaceByID = async (req, res, next) => {
 
 
 const getPlacesByUserID = async (req, res, next) => {
-  const uID = req.params.uid;
-  let places 
+  const userId = req.params.uid;
 
-  try{
-
-    places = await Place.find({creator:uID})
-
-  }catch(e){
-    const error = new HttpError("Couldn't find a place by the userID given.",500)
-    return next(error)
+  // let places;
+  let userWithPlaces;
+  try {
+    userWithPlaces = await User.findById(userId).populate("places");
+  } catch (err) {
+    const error = new HttpError("Fetching places failed, please try again later.", 500);
+    return next(error);
   }
 
-
-  if (!places || places.length === 0) {
-    return next(new HttpError("Could not find a place for the provided user ID", 404));
+  // if (!places || places.length === 0) {
+  if (!userWithPlaces ) {
+    return next(new HttpError("Could not find places for the provided user id.", 404));
   }
 
-  // places = places.forEach(p=>{return p.toObject({getters:true})})
-  res.json({ places:places.map(place=>{ return place.toObject({getters:true})}) });
+  res.json({ places: userWithPlaces.places.map((place) => place.toObject({ getters: true })) });
 };
 
 
@@ -191,14 +189,14 @@ const deletePlace = async (req,res,next)=>{
       sess.startTransaction()
       await place.remove({session:sess})
       place.creator.places.pull(place);
-      place.creator.save({session:sess})
+      await place.creator.save({ session: sess });
       await sess.commitTransaction();
 
     } catch (error) {
       const err = new HttpError("Something went wrong, couldn't delete place.", 500);
       return next(err)
     }
-    
+    console.log("Place deleted");
     res.status(200).json({message:"Place Deleted"})
 
 

@@ -1,40 +1,40 @@
-import React from "react"
-import {useParams} from "react-router-dom"
-import PlaceList from "../components/PlaceList"
+import React, { useState, useEffect } from "react";
+import { useParams } from "react-router-dom";
+import { useHttpClient } from "../../shared/hooks/http-hook";
+import PlaceList from "../components/PlaceList";
+import ErrorModal from "../../shared/components/UIElements/ErrorModal";
+import LoadingSpinner from "../../shared/components/UIElements/LoadingSpinner";
 
-const DUMMY_PLACES = [
-  {
-    id: "p1",
-    title: "Canton Tower",
-    description:
-      "The Canton Tower, formally Guangzhou TV Astronomical and Sightseeing Tower, is a 604-meter-tall multipurpose observation tower in the Haizhu District of Guangzhou. The tower was topped out in 2009 and it became operational on 29 September 2010 for the 2010 Asian Games",
-    image: "https://www.chinadiscovery.com/assets/images/travel-guide/guangzhou/canton-tower/canton-tower-768-1.jpg",
-    address: "Yuejiang W Rd, Haizhu District, Guangzhou, Guangdong Province, China",
-    location: {
-      lat: 23.10748,
-      lng: 113.3226476,
-    },
-    creator: "u1",
-  },
-  {
-    id: "p2",
-    title: "Canton Tower",
-    description:
-      "The Canton Tower, formally Guangzhou TV Astronomical and Sightseeing Tower, is a 604-meter-tall multipurpose observation tower in the Haizhu District of Guangzhou. The tower was topped out in 2009 and it became operational on 29 September 2010 for the 2010 Asian Games",
-    image: "https://www.chinadiscovery.com/assets/images/travel-guide/guangzhou/canton-tower/canton-tower-768-1.jpg",
-    address: "Yuejiang W Rd, Haizhu District, Guangzhou, Guangdong Province, China",
-    location: {
-      lat: 23.10748,
-      lng: 113.3226476,
-    },
-    creator: "u2",
-  },
-];
+const UserPlaces = (props) => {
+  const [loadedPlaces, setLoadedPlaces] = useState();
+  const { isLoading, error, sendRequest, clearError } = useHttpClient();
 
-const UserPlaces = (props)=>{
-const userId = useParams().userId;
-const loadPlaces = DUMMY_PLACES.filter((place)=>{ return place.creator === userId})
-return <PlaceList items={loadPlaces} />;
-}
+  const userId = useParams().userId;
+  useEffect(() => {
+    const fetchPlaces = async () => {
+      try {
+        const responseData = await sendRequest(`http://localhost:5000/api/places/user/${userId}`);
+        setLoadedPlaces(responseData.places);
+      } catch (err) {}
+    };
+    fetchPlaces();
+  }, [sendRequest, userId]);
 
-export default UserPlaces
+  const placeDeletedHandler = (deletedPlaceId) => {
+    setLoadedPlaces((prevPlaces) => prevPlaces.filter((place) => place.id !== deletedPlaceId));
+  };
+
+  return (
+    <React.Fragment>
+      <ErrorModal error={error} onClear={clearError} />
+      {isLoading && (
+        <div className="center">
+          <LoadingSpinner />
+        </div>
+      )}
+      {!isLoading && loadedPlaces && <PlaceList items={loadedPlaces} onDeletePlace={placeDeletedHandler} />}
+    </React.Fragment>
+  );
+};
+
+export default UserPlaces;
