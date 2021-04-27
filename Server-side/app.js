@@ -1,6 +1,8 @@
 const express = require("express")
 const bodyParser = require("body-parser")
 const mongoose = require("mongoose")
+const path = require("path")
+const fs = require("fs")
 const cors = require("cors")
 require("dotenv").config();
 
@@ -21,6 +23,8 @@ app.use(bodyParser.json());
 //     next()
 // })
 
+app.use("/uploads/images", express.static(path.join("uploads","images")));
+
 app.use(cors());
 
 app.use("/api/places", placesRoutes); // /api/places/...
@@ -34,7 +38,11 @@ app.use((req,res,next)=>{
 
 // Middleware for error handling
 app.use((error, req, res, next)=>{
-
+    if(req.file){
+      fs.unlink(req.file.path, (err)=>{
+        console.log(err);
+      })
+    }
     if(res.headerSent){
         return next(error)
     }

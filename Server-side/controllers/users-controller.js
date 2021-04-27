@@ -23,6 +23,7 @@ const getUsers = async (req,res,next)=>{
 }
 
 const createUser = async (req, res, next) => {
+  
 
     const errors = validationResult(req);
 
@@ -51,7 +52,7 @@ const createUser = async (req, res, next) => {
     const newUser = new User({
       name,
       email,
-      image:"https://images.unsplash.com/photo-1532074205216-d0e1f4b87368?ixid=MXwxMjA3fDB8MHxzZWFyY2h8MjJ8fHByb2ZpbGV8ZW58MHx8MHw%3D&ixlib=rb-1.2.1&w=1000&q=80",
+      image:req.file.path,
       password,
       places:[]
     });

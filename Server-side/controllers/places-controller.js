@@ -5,6 +5,7 @@ const Place = require("../models/place")
 const User = require("../models/user");
 const mongooseUniqueValidator = require("mongoose-unique-validator");
 const mongoose = require("mongoose")
+const fs = require("fs")
 
 
 
@@ -84,7 +85,7 @@ const createPlace = async (req,res,next)=>{
       description,
       address,
       location: test,
-      image: "https://i.pinimg.com/originals/e8/c7/c4/e8c7c4d4e14a9e3b21faf3d7b37c5b03.jpg",
+      image: req.file.path.replace(/\\/g, "/"),
       creator,
     });
 
@@ -183,6 +184,7 @@ const deletePlace = async (req,res,next)=>{
       const err = new HttpError("Couldn't find place for this ID",404)
       return next(err)
     }
+    const imagePath = place.image
     
     try {
       const sess = await mongoose.startSession()
@@ -196,6 +198,12 @@ const deletePlace = async (req,res,next)=>{
       const err = new HttpError("Something went wrong, couldn't delete place.", 500);
       return next(err)
     }
+
+
+    fs.unlink(imagePath,(err)=>{
+      console.log(err);
+    })
+
     console.log("Place deleted");
     res.status(200).json({message:"Place Deleted"})
 
