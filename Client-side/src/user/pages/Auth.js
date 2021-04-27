@@ -4,6 +4,7 @@ import { VALIDATOR_EMAIL, VALIDATOR_REQUIRE, VALIDATOR_MINLENGTH } from "../../s
 import { useHttpClient } from "../../shared/hooks/http-hook";
 import { useForm } from "../../shared/hooks/form-hook";
 import Input from "../../shared/components/FormElements/Input";
+import ImageUpload from "../../shared/components/FormElements/ImageUpload";
 import Button from "../../shared/components/FormElements/Button";
 import Card from "../../shared/components/UIElements/Card";
 import LoadingSpinner from "../../shared/components/UIElements/LoadingSpinner";
@@ -38,6 +39,7 @@ const Auth = (props) => {
         {
           ...formState,
           name: undefined,
+          image: undefined,
         },
         formState.inputs.email.isValid && formState.inputs.email.isValid
       );
@@ -49,6 +51,10 @@ const Auth = (props) => {
             value: "",
             isValid: false,
           },
+          image: {
+            value: null,
+            isValid: false,
+          },
         },
         false
       );
@@ -58,6 +64,7 @@ const Auth = (props) => {
 
   const authSubmitHandler = async (event) => {
     event.preventDefault();
+    console.log(formState.inputs);
 
     if (islogIn) {
       try {
@@ -77,19 +84,13 @@ const Auth = (props) => {
       } catch (err) {}
     } else {
       try {
-        const responseData = await sendRequest(
-          "http://localhost:5000/api/users/signup",
-          "POST",
-          JSON.stringify({
-            name: formState.inputs.name.value,
-            email: formState.inputs.email.value,
-            password: formState.inputs.password.value,
-          }),
-          {
-            "Content-Type": "application/json",
-          }
-        );
-
+        const formData = new FormData();
+        formData.append("name", formState.inputs.name.value);
+        formData.append("email", formState.inputs.email.value);
+        formData.append("password", formState.inputs.password.value);
+        formData.append("image", formState.inputs.image.value);
+        const responseData = await sendRequest("http://localhost:5000/api/users/signup", "POST", formData);
+        console.log(responseData);
         auth.login(responseData.user.id);
       } catch (err) {}
     }
@@ -113,6 +114,7 @@ const Auth = (props) => {
               onInput={inputHandler}
             />
           )}
+          {!islogIn && <ImageUpload center id="image" onInput={inputHandler} errorText="Please upload a user image." />}
           <Input
             id="email"
             element="input"
