@@ -1,6 +1,8 @@
 const HttpError = require("../models/http-error")
 const {validationResult} = require("express-validator")
 const User = require("../models/user")
+const bcrypt = require("bcryptjs")
+const jwt = require("jsonwebtoken")
 
 
 
@@ -49,12 +51,21 @@ const createUser = async (req, res, next) => {
       return next(err)
     }
 
+    let hashedPassword;
+    try {
+      hashedPassword = await bcrypt.hash(password, 12)
+      
+    } catch (error) {
+      const err = new HttpError("Signing up failed, please try again later.", 500);
+      return next(err);
+    }
+
     const newUser = new User({
       name,
       email,
-      image:req.file.path,
-      password,
-      places:[]
+      image: req.file.path,
+      password:hashedPassword,
+      places: [],
     });
     
 
@@ -67,7 +78,18 @@ const createUser = async (req, res, next) => {
       return next(error);
     }
 
-    res.status(201).json({ message: "User created", user: newUser.toObject({getters:true}) });
+    let token;
+
+    try {
+      token = jwt.sign({ userId: newUser.id, email: newUser.email}, "keytothechamberofsecrets",{expiresIn:"1h"});
+      
+    } catch (error) {
+      const err = new HttpError("Signing up failed, please try again.", 500);
+      return next(err);
+    }
+
+
+    res.status(201).json({ userId:newUser.id, email:newUser.email, token: token});
 
 };
 
@@ -87,12 +109,38 @@ const userLogin = async (req, res, next) => {
       return next(err)
     }
 
-    if(!existingUser || existingUser.password != password){
+    if(!existingUser){
       const err = new HttpError("Invalid credentials,signing in failed",401)
       return next(err)
     }
+
+    let isValidPassword = false;
+    try {
+      
+      isValidPassword = await bcrypt.compare(password, existingUser.password)
+    } catch (error) {
+      const err = new HttpError("Signing in failed, please try again.", 500);
+      return next(err);
+    }
+
+    if (!isValidPassword) {
+      const err = new HttpError("Invalid credentials,signing in failed", 401);
+      return next(err);
+    }
+
+    let token;
+
+    try {
+      token = jwt.sign({ userId: existingUser.id, email: existingUser.email }, "keytothechamberofsecrets", {
+        expiresIn: "1h",
+      });
+    } catch (error) {
+      const err = new HttpError("Signing in failed, please try again.", 500);
+      return next(err);
+    }
+
     
-    res.json({message:"Logged in", user:existingUser.toObject({getters:true})})
+    res.json({ userId: existingUser.id, email: existingUser.email, token: token });
 
 };
 

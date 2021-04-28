@@ -64,7 +64,7 @@ const createPlace = async (req,res,next)=>{
      return next (new HttpError("Invalid input passed, please check your data.", 422))
   }
 
-    const {title,description,address,creator} = req.body;
+    const {title,description,address} = req.body;
 
    
 
@@ -86,13 +86,13 @@ const createPlace = async (req,res,next)=>{
       address,
       location: test,
       image: req.file.path.replace(/\\/g, "/"),
-      creator,
+      creator:req.userData.userId,
     });
 
 
     let user
     try {
-        user = await User.findById(creator)
+        user = await User.findById(req.userData.userId);
     } catch (error) {
       const err = new HttpError("Creating place failed please try again",500)
       return next(err)
@@ -148,6 +148,10 @@ const patchPlace = async (req,res,next)=>{
     return next(err)
   }
 
+  if(place.creator.toString() !== req.userData.userId){
+    const err = new HttpError("Unauthorized request.", 401);
+    return next(err);
+  }
  
   place.title = title
   place.description = description;
@@ -185,7 +189,10 @@ const deletePlace = async (req,res,next)=>{
       return next(err)
     }
     const imagePath = place.image
-    
+    if (place.creator.id.toString() !== req.userData.userId) {
+      const err = new HttpError("Unauthorized request.", 401);
+      return next(err);
+    }
     try {
       const sess = await mongoose.startSession()
       sess.startTransaction()
