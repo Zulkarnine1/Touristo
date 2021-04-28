@@ -81,7 +81,7 @@ const createUser = async (req, res, next) => {
     let token;
 
     try {
-      token = jwt.sign({ userId: newUser.id, email: newUser.email}, "keytothechamberofsecrets",{expiresIn:"1h"});
+      token = jwt.sign({ userId: newUser.id, email: newUser.email}, process.env.JWT_KEY,{expiresIn:"1h"});
       
     } catch (error) {
       const err = new HttpError("Signing up failed, please try again.", 500);
@@ -131,7 +131,7 @@ const userLogin = async (req, res, next) => {
     let token;
 
     try {
-      token = jwt.sign({ userId: existingUser.id, email: existingUser.email }, "keytothechamberofsecrets", {
+      token = jwt.sign({ userId: existingUser.id, email: existingUser.email }, process.env.JWT_KEY, {
         expiresIn: "1h",
       });
     } catch (error) {

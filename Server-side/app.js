@@ -4,7 +4,7 @@ const mongoose = require("mongoose")
 const path = require("path")
 const fs = require("fs")
 const cors = require("cors")
-require("dotenv").config();
+
 
 const placesRoutes = require("./routes/places-routes")
 const usersRoutes = require("./routes/users-routes")
@@ -53,7 +53,14 @@ app.use((error, req, res, next)=>{
 
 
 mongoose
-  .connect(process.env.MONGO_KEY, { useNewUrlParser: true, useUnifiedTopology: true, useCreateIndex: true })
+  .connect(
+    `mongodb+srv://${process.env.DB_USER}:${process.env.DB_PASSWORD}@cluster0.ayjbu.mongodb.net/${process.env.DB_NAME}?retryWrites=true&w=majority`,
+    {
+      useNewUrlParser: true,
+      useUnifiedTopology: true,
+      useCreateIndex: true,
+    }
+  )
   .then(() => {
     app.listen(5000);
   })
