@@ -1,8 +1,8 @@
 {
     "env" : {
-        "DB_USER":"zeus",
-        "DB_PASSWORD":"xgq7Qzw5D9Sk1si6",
-        "DB_NAME":"Touristo",
+        "DB_USER":"Athena",
+        "DB_PASSWORD":"iWhjQgJNUq1Us2Id",
+        "DB_NAME":"betatouristo",
         "LOCATION_API_KEY":"pk.65d2a5e545a5bbc1be48fc96d2a88f9a",
         "JWT_KEY":"keytothechamberofsecrets"
     }
