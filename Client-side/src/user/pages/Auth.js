@@ -69,7 +69,7 @@ const Auth = (props) => {
     if (islogIn) {
       try {
         const responseData = await sendRequest(
-          "http://localhost:5000/api/users/login",
+          process.env.REACT_APP_BACKEND_URL + "/users/login",
           "POST",
           JSON.stringify({
             email: formState.inputs.email.value,
@@ -89,7 +89,7 @@ const Auth = (props) => {
         formData.append("email", formState.inputs.email.value);
         formData.append("password", formState.inputs.password.value);
         formData.append("image", formState.inputs.image.value);
-        const responseData = await sendRequest("http://localhost:5000/api/users/signup", "POST", formData);
+        const responseData = await sendRequest(process.env.REACT_APP_BACKEND_URL + "/users/signup", "POST", formData);
         console.log(responseData);
         auth.login(responseData.userId, responseData.token);
       } catch (err) {}
