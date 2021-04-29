@@ -8,9 +8,11 @@ const router = express.Router()
 
 router.get("/", usersControllers.getUsers);
 
+
+
+
 router.post(
   "/signup",
-  fileUpload.single("image"),
   [
     (check("email").normalizeEmail().isEmail(),
     check("password").isLength({ min: 8, max: 16 }),

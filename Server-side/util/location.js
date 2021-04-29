@@ -4,7 +4,7 @@ const HttpError = require("../models/http-error");
 const { urlencoded } = require("body-parser");
 
 
-const API_KEY = process.env.LOCAION_API_KEY;
+const API_KEY = process.env.LOCATION_API_KEY;
 
 async function getCoordsFromAddress(address){
 

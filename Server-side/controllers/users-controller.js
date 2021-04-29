@@ -3,6 +3,8 @@ const {validationResult} = require("express-validator")
 const User = require("../models/user")
 const bcrypt = require("bcryptjs")
 const jwt = require("jsonwebtoken")
+const mediaManager = require("../util/media-manager")
+const fs = require("fs")
 
 
 
@@ -59,12 +61,22 @@ const createUser = async (req, res, next) => {
       const err = new HttpError("Signing up failed, please try again later.", 500);
       return next(err);
     }
+    
+    let link;
+    try {
+      link = await mediaManager.uploadFile(req.files.image.tempFilePath, {
+        folder: "touristo/user",
+      });
+    } catch (error) {
+      
+      return next(error);
+    }
 
     const newUser = new User({
       name,
       email,
-      image: req.file.path,
-      password:hashedPassword,
+      image: link.url,
+      password: hashedPassword,
       places: [],
     });
     

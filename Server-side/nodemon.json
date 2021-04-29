@@ -4,6 +4,9 @@
         "DB_PASSWORD":"iWhjQgJNUq1Us2Id",
         "DB_NAME":"betatouristo",
         "LOCATION_API_KEY":"pk.65d2a5e545a5bbc1be48fc96d2a88f9a",
-        "JWT_KEY":"keytothechamberofsecrets"
+        "JWT_KEY":"keytothechamberofsecrets",
+        "CLOUDINARY_CLOUD_NAME":"scut-zulk",
+        "CLOUDINARY_API_KEY":"779434185826664",
+        "CLOUDINARY_SECRET":"5G2dKJDd6r17sJXi527hjnqPez0"
     }
 }

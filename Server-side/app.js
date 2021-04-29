@@ -4,6 +4,7 @@ const mongoose = require("mongoose")
 const path = require("path")
 const fs = require("fs")
 const cors = require("cors")
+const fileUpload = require("express-fileupload");
 
 
 const placesRoutes = require("./routes/places-routes")
@@ -12,6 +13,12 @@ const HttpError = require("./models/http-error")
 
 const app = express()
 
+// file uploader
+app.use(
+  fileUpload({
+    useTempFiles: true,
+  })
+);
 app.use(bodyParser.json());
 
 // app.use((req,res,next)=>{
@@ -23,7 +30,7 @@ app.use(bodyParser.json());
 //     next()
 // })
 
-app.use("/uploads/images", express.static(path.join("uploads","images")));
+// app.use("/uploads/images", express.static(path.join("uploads","images")));
 
 app.use(cors());
 
@@ -38,10 +45,13 @@ app.use((req,res,next)=>{
 
 // Middleware for error handling
 app.use((error, req, res, next)=>{
-    if(req.file){
-      fs.unlink(req.file.path, (err)=>{
-        console.log(err);
-      })
+    if(req.files){
+      if(req.files.image){
+
+        fs.unlink(req.files.image.tempFilePath, (err) => {
+          console.log(err);
+        });
+      }
     }
     if(res.headerSent){
         return next(error)

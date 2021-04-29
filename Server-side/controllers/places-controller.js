@@ -6,7 +6,7 @@ const User = require("../models/user");
 const mongooseUniqueValidator = require("mongoose-unique-validator");
 const mongoose = require("mongoose")
 const fs = require("fs")
-
+const mediaManager = require("../util/media-manager");
 
 
 
@@ -80,13 +80,22 @@ const createPlace = async (req,res,next)=>{
         lng:coords.lng,
       }
 
+      let link;
+      try {
+        link = await mediaManager.uploadFile(req.files.image.tempFilePath, {
+          folder: "touristo/places",
+        });
+      } catch (error) {
+        return next(error);
+      }
+
     const createdPlace = new Place({
       title,
       description,
       address,
       location: test,
-      image: req.file.path.replace(/\\/g, "/"),
-      creator:req.userData.userId,
+      image: link.url,
+      creator: req.userData.userId,
     });
 
 
@@ -188,6 +197,7 @@ const deletePlace = async (req,res,next)=>{
       const err = new HttpError("Couldn't find place for this ID",404)
       return next(err)
     }
+    console.log(place);
     const imagePath = place.image
     if (place.creator.id.toString() !== req.userData.userId) {
       const err = new HttpError("Unauthorized request.", 401);
@@ -207,9 +217,13 @@ const deletePlace = async (req,res,next)=>{
     }
 
 
-    fs.unlink(imagePath,(err)=>{
-      console.log(err);
-    })
+    // fs.unlink(imagePath,(err)=>{
+    //   console.log(err);
+    // })
+
+    mediaManager.deleteFile(imagePath);
+
+
 
     console.log("Place deleted");
     res.status(200).json({message:"Place Deleted"})
